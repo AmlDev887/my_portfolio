@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Backend Developer — FastAPI, Python, PostgreSQL, Docker">
+<title>Amalbek — Backend Developer</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root[data-theme="dark"]{--bg:#0d0d0f;--bg2:#141417;--bg3:#1c1c21;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);--text:#f0f0f0;--text2:#888;--text3:#555;--accent:#5b6af0;--accent-bg:rgba(91,106,240,0.12);--tag-bg:rgba(91,106,240,0.15);--tag-text:#9aa3f7;--card:#141417;--nav-bg:rgba(13,13,15,0.9);--btn-bg:#5b6af0;--btn-text:#fff;--success:#3ecf8e;--danger:#e24b4a}
+:root[data-theme="light"]{--bg:#f4f4f6;--bg2:#fff;--bg3:#ebebed;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);--text:#111;--text2:#555;--text3:#aaa;--accent:#4455ee;--accent-bg:rgba(68,85,238,0.08);--tag-bg:rgba(68,85,238,0.1);--tag-text:#4455ee;--card:#fff;--nav-bg:rgba(244,244,246,0.92);--btn-bg:#4455ee;--btn-text:#fff;--success:#1a9e6b;--danger:#c0392b}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+input,textarea,select{font-family:'Syne',sans-serif}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:60px;background:var(--nav-bg);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-0.02em}.nav-logo span{color:var(--accent)}
+.nav-links{display:flex;gap:2rem;font-size:.875rem;font-weight:600}
+.nav-links a{color:var(--text2);transition:color .2s}.nav-links a:hover{color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:.75rem}
+.theme-btn{background:none;border:1px solid var(--border2);color:var(--text2);cursor:pointer;width:36px;height:36px;border-radius:8px;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.theme-btn:hover{background:var(--bg3)}
+.hamburger{display:none;background:none;border:none;cursor:pointer;color:var(--text);flex-direction:column;gap:5px;padding:4px}
+.hamburger span{display:block;width:22px;height:2px;background:currentColor;border-radius:2px}
+.mobile-menu{display:none;position:fixed;top:60px;left:0;right:0;z-index:199;background:var(--bg2);border-bottom:1px solid var(--border);padding:1rem 2rem;flex-direction:column;gap:1rem}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-size:1rem;font-weight:600;color:var(--text2);padding:.5rem 0;border-bottom:1px solid var(--border)}
+
+/* LAYOUT */
+.hero{min-height:100vh;display:flex;align-items:center;padding:100px 2rem 4rem;max-width:1100px;margin:0 auto;gap:4rem}
+.hero-content{flex:1}
+section{max-width:1100px;margin:0 auto;padding:5rem 2rem}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;margin-bottom:.6rem}
+.section-title{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:.75rem}
+.section-subtitle{color:var(--text2);font-size:.92rem;margin-bottom:2.5rem}
+.divider{border:none;border-top:1px solid var(--border);margin:0 2rem}
+
+/* HERO */
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--accent-bg);border:1px solid rgba(91,106,240,.25);color:var(--tag-text);font-size:.72rem;font-weight:600;padding:.35rem .75rem;border-radius:20px;margin-bottom:1.5rem;font-family:'JetBrains Mono',monospace}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--success);animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+h1{font-size:clamp(2.4rem,6vw,4.5rem);font-weight:800;line-height:1.05;letter-spacing:-0.03em;margin-bottom:1.25rem}
+h1 .accent{color:var(--accent)}
+.hero-desc{font-size:1rem;color:var(--text2);line-height:1.75;max-width:480px;margin-bottom:2rem}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.4rem;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;transition:all .2s;border:none;white-space:nowrap}
+.btn-primary{background:var(--btn-bg);color:var(--btn-text)}.btn-primary:hover{opacity:.85;transform:translateY(-1px)}
+.btn-outline{background:none;border:1px solid var(--border2);color:var(--text)}.btn-outline:hover{background:var(--bg3);transform:translateY(-1px)}
+.btn-sm{padding:.5rem 1rem;font-size:.8rem;border-radius:8px}
+.btn-danger{background:rgba(226,75,74,.15);color:var(--danger);border:1px solid rgba(226,75,74,.2)}.btn-danger:hover{background:rgba(226,75,74,.25)}
+.btn-success{background:rgba(62,207,142,.12);color:var(--success);border:1px solid rgba(62,207,142,.2)}.btn-success:hover{background:rgba(62,207,142,.2)}
+
+/* PHOTO */
+.hero-photo{flex-shrink:0}
+.photo-wrap{width:220px;height:220px;border-radius:24px;border:2px solid var(--border2);overflow:hidden;position:relative;background:var(--bg3);cursor:pointer}
+.photo-wrap img{width:100%;height:100%;object-fit:cover;display:none}.photo-wrap img.loaded{display:block}
+.photo-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:var(--text3);font-size:.78rem;text-align:center;padding:1rem;line-height:1.5}
+.photo-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s;color:#fff;font-size:.8rem;font-weight:600}
+.photo-wrap:hover .photo-overlay{opacity:1}
+
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+.about-text p{color:var(--text2);line-height:1.8;font-size:.95rem;margin-bottom:1rem}
+.about-stats{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.25rem 1rem}
+.stat-num{font-size:1.9rem;font-weight:800;color:var(--accent);letter-spacing:-0.03em}
+.stat-label{font-size:.78rem;color:var(--text2);margin-top:.2rem}
+
+/* SKILLS */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:1rem}
+.skill-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.25rem 1rem;display:flex;flex-direction:column;gap:.4rem;transition:border-color .2s,transform .2s}
+.skill-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.skill-icon{font-size:1.3rem}.skill-name{font-weight:700;font-size:.88rem}
+.skill-level{font-size:.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace}
+.skill-bar{width:100%;height:3px;background:var(--bg3);border-radius:2px;margin-top:.2rem}
+.skill-bar-fill{height:100%;border-radius:2px;background:var(--accent);transition:width .9s ease}
+
+/* ============ PROJECTS ============ */
+.projects-section-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem}
+
+/* PROJECT CARD */
+.project-card{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s,transform .2s}
+.project-card:hover{border-color:var(--border2);transform:translateY(-4px)}
+.project-screenshots{position:relative;background:var(--bg3);height:200px;overflow:hidden;cursor:pointer}
+.project-screenshots img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.project-card:hover .project-screenshots img{transform:scale(1.04)}
+.project-screenshots-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:var(--text3);font-size:.78rem;cursor:pointer;transition:background .2s}
+.project-screenshots-placeholder:hover{background:var(--bg2)}
+.screenshot-count{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.6);color:#fff;font-size:.7rem;font-family:'JetBrains Mono',monospace;padding:.2rem .5rem;border-radius:6px}
+.screenshots-nav{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 .5rem;opacity:0;transition:.2s}
+.project-screenshots:hover .screenshots-nav{opacity:1}
+.screenshots-btn{background:rgba(0,0,0,.5);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:.2s}
+.screenshots-btn:hover{background:rgba(0,0,0,.8)}
+.project-body{padding:1.5rem;display:flex;flex-direction:column;gap:.75rem;flex:1}
+.project-top{display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem}
+.project-title{font-size:1.05rem;font-weight:800;line-height:1.3}
+.project-actions{display:flex;gap:.4rem;flex-shrink:0}
+.icon-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--text2);cursor:pointer;transition:all .2s;font-size:.8rem}
+.icon-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.icon-btn.danger:hover{background:var(--danger);border-color:var(--danger)}
+.project-desc-text{color:var(--text2);font-size:.875rem;line-height:1.65}
+.project-tags{display:flex;flex-wrap:wrap;gap:.35rem}
+.tag{background:var(--tag-bg);color:var(--tag-text);font-size:.68rem;font-weight:600;padding:.25rem .55rem;border-radius:6px;font-family:'JetBrains Mono',monospace}
+.project-links-row{display:flex;gap:.5rem;margin-top:auto;padding-top:.5rem}
+.project-ext-link{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:600;color:var(--text2);border:1px solid var(--border2);border-radius:7px;padding:.3rem .7rem;transition:all .2s}
+.project-ext-link:hover{color:var(--accent);border-color:var(--accent)}
+
+/* ADD PROJECT CARD */
+.add-project-card{background:none;border:1.5px dashed var(--border2);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;padding:2rem;cursor:pointer;transition:all .2s;min-height:300px;color:var(--text3)}
+.add-project-card:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.add-project-card svg{transition:.2s}
+.add-project-label{font-size:.9rem;font-weight:700}
+
+/* ============ EDUCATION / COURSES ============ */
+.edu-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:1.5rem}
+.edu-card-header{padding:1.5rem 1.75rem;display:grid;grid-template-columns:auto 1fr auto;gap:1.25rem;align-items:start}
+.edu-icon{width:48px;height:48px;border-radius:14px;background:var(--accent-bg);border:1px solid rgba(91,106,240,.2);display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0}
+.edu-body{flex:1}
+.edu-degree{font-size:1rem;font-weight:800;margin-bottom:.15rem}
+.edu-school{color:var(--accent);font-weight:600;font-size:.88rem;margin-bottom:.15rem}
+.edu-year{color:var(--text3);font-size:.72rem;font-family:'JetBrains Mono',monospace;margin-bottom:.6rem}
+.edu-desc-text{color:var(--text2);font-size:.86rem;line-height:1.6}
+.edu-actions{display:flex;gap:.4rem;flex-shrink:0}
+
+/* DIPLOMA / CERT UPLOAD */
+.upload-zone{border-top:1px solid var(--border);padding:1.25rem 1.75rem;display:flex;align-items:center;gap:1rem;cursor:pointer;transition:background .2s}
+.upload-zone:hover{background:var(--accent-bg)}
+.upload-zone.has-file{background:rgba(62,207,142,.05)}
+.upload-zone-icon{width:36px;height:36px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.upload-zone-info{flex:1}
+.upload-zone-title{font-size:.82rem;font-weight:700;margin-bottom:.1rem}
+.upload-zone-hint{font-size:.7rem;color:var(--text3)}
+
+/* COURSES GRID */
+.courses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem;margin-bottom:1.5rem}
+.course-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s,transform .2s}
+.course-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.course-cert-preview{height:140px;background:var(--bg3);overflow:hidden;cursor:pointer;position:relative}
+.course-cert-preview img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.course-card:hover .course-cert-preview img{transform:scale(1.06)}
+.course-cert-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;color:var(--text3);font-size:.74rem;cursor:pointer}
+.course-cert-placeholder:hover{background:var(--bg2)}
+.course-body{padding:1.1rem 1.25rem;display:flex;flex-direction:column;gap:.6rem;flex:1}
+.course-top{display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem}
+.course-name{font-size:.92rem;font-weight:700;line-height:1.3}
+.course-platform{font-size:.72rem;color:var(--accent);font-weight:600;font-family:'JetBrains Mono',monospace}
+.course-desc-text{color:var(--text2);font-size:.8rem;line-height:1.6}
+.add-course-card{background:none;border:1.5px dashed var(--border2);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;padding:1.5rem;cursor:pointer;transition:all .2s;min-height:180px;color:var(--text3)}
+.add-course-card:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.add-course-label{font-size:.82rem;font-weight:700}
+
+/* CONTACTS */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+.contact-text p{color:var(--text2);line-height:1.8;font-size:.95rem;margin-bottom:1.5rem}
+.contact-links{display:flex;flex-direction:column;gap:.75rem}
+.contact-link{display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border-radius:12px;background:var(--card);border:1px solid var(--border);transition:all .2s}
+.contact-link:hover{border-color:var(--accent);transform:translateX(4px)}
+.contact-icon{width:36px;height:36px;border-radius:9px;background:var(--accent-bg);display:flex;align-items:center;justify-content:center;font-size:.95rem;color:var(--accent);flex-shrink:0}
+.contact-info{flex:1}
+.contact-label{font-size:.68rem;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:.1rem}
+.contact-val{font-size:.88rem;font-weight:600}
+.contact-arrow{color:var(--text3);transition:.2s}
+.contact-link:hover .contact-arrow{color:var(--accent)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
+.modal-overlay.hidden{display:none}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;padding:2rem;display:flex;flex-direction:column;gap:1.25rem}
+.modal-title{font-size:1.2rem;font-weight:800;letter-spacing:-0.02em}
+.modal-close{position:sticky;top:0;align-self:flex-end;background:var(--bg3);border:none;color:var(--text2);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;margin-bottom:-.75rem}
+.field{display:flex;flex-direction:column;gap:.4rem}
+.field label{font-size:.78rem;font-weight:700;color:var(--text2)}
+.field input,.field textarea,.field select{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:.75rem 1rem;color:var(--text);font-size:.9rem;outline:none;transition:border-color .2s;width:100%}
+.field input:focus,.field textarea:focus{border-color:var(--accent)}
+.field textarea{resize:vertical;min-height:80px;line-height:1.5}
+.field-hint{font-size:.72rem;color:var(--text3)}
+
+/* SCREENSHOT UPLOAD IN MODAL */
+.screenshots-upload-area{border:1.5px dashed var(--border2);border-radius:12px;padding:1.25rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.75rem;text-align:center}
+.screenshots-upload-area:hover{border-color:var(--accent);background:var(--accent-bg)}
+.screenshots-preview{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem}
+.screenshot-thumb{width:72px;height:54px;border-radius:8px;overflow:hidden;position:relative;border:1px solid var(--border2)}
+.screenshot-thumb img{width:100%;height:100%;object-fit:cover}
+.screenshot-thumb-remove{position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:4px;background:rgba(226,75,74,.85);border:none;color:#fff;cursor:pointer;font-size:.6rem;display:flex;align-items:center;justify-content:center}
+
+/* LIGHTBOX */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem}
+.lightbox.hidden{display:none}
+.lightbox img{max-width:90vw;max-height:85vh;object-fit:contain;border-radius:8px}
+.lightbox-close{position:fixed;top:1rem;right:1rem;background:rgba(255,255,255,.1);border:none;color:#fff;width:40px;height:40px;border-radius:10px;cursor:pointer;font-size:1.2rem}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--text3);font-size:.76rem;font-family:'JetBrains Mono',monospace}
+
+/* MOBILE */
+@media(max-width:768px){
+  .nav-links{display:none}.hamburger{display:flex}
+  .hero{flex-direction:column-reverse;gap:2rem;padding-top:88px;text-align:center}
+  .hero-desc{max-width:100%}.hero-btns{justify-content:center}
+  .hero-photo{display:flex;justify-content:center}
+  .photo-wrap{width:160px;height:160px}
+  .about-grid,.contact-grid{grid-template-columns:1fr}
+  .edu-card-header{grid-template-columns:auto 1fr}
+  .edu-actions{grid-column:2}
+  .projects-grid{grid-template-columns:1fr}
+  .courses-grid{grid-template-columns:1fr}
+  .projects-section-header{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">A<span>.</span>dev</div>
+  <div class="nav-links">
+    <a href="#about">О себе</a><a href="#skills">Навыки</a>
+    <a href="#projects">Проекты</a><a href="#education">Образование</a><a href="#contact">Контакты</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-btn" onclick="toggleTheme()"><span id="themeIcon">☀️</span></button>
+    <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" onclick="toggleMenu()">О себе</a><a href="#skills" onclick="toggleMenu()">Навыки</a>
+  <a href="#projects" onclick="toggleMenu()">Проекты</a><a href="#education" onclick="toggleMenu()">Образование</a>
+  <a href="#contact" onclick="toggleMenu()">Контакты</a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-badge"><div class="badge-dot"></div>Открыт к новым проектам</div>
+    <h1>Amalbek<br><span class="accent">Backend Dev</span></h1>
+    <p class="hero-desc">Разрабатываю надёжные и масштабируемые API на FastAPI и Python. Работаю с PostgreSQL, Docker, SQLAlchemy и Pydantic — от архитектуры до деплоя.</p>
+    <div class="hero-btns">
+      <a href="#projects" class="btn btn-primary">Посмотреть проекты →</a>
+      <a href="#contact" class="btn btn-outline">Связаться</a>
+    </div>
+  </div>
+  <div class="hero-photo">
+    <div class="photo-wrap" onclick="document.getElementById('photoInput').click()">
+      <img id="profileImg" alt="Фото">
+      <div class="photo-placeholder" id="photoPlaceholder">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="opacity:.4"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <span>Нажми чтобы<br>загрузить фото</span>
+      </div>
+      <div class="photo-overlay">📷 Сменить</div>
+    </div>
+    <input type="file" id="photoInput" accept="image/*" onchange="loadPhoto(event)" style="display:none">
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">// 01. about</div>
+  <div class="section-title">О себе</div>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>Я Backend-разработчик, специализирующийся на Python и FastAPI. Создаю чистые, хорошо документированные REST API с продуманной архитектурой.</p>
+      <p>Работаю с реляционными базами данных, строю системы аутентификации, настраиваю Docker-окружения и пишу тесты. Люблю порядок в коде.</p>
+      <p>Сейчас работаю на практике — активно применяю знания и продолжаю развиваться как специалист.</p>
+    </div>
+    <div class="about-stats">
+      <div class="stat-card"><div class="stat-num">5+</div><div class="stat-label">Завершённых проектов</div></div>
+      <div class="stat-card"><div class="stat-num">1+</div><div class="stat-label">Год практики</div></div>
+      <div class="stat-card"><div class="stat-num">FastAPI</div><div class="stat-label">Основной фреймворк</div></div>
+      <div class="stat-card"><div class="stat-num">Git</div><div class="stat-label">Каждый день</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label">// 02. skills</div>
+  <div class="section-title">Навыки</div>
+  <div class="skills-grid">
+    <div class="skill-card"><div class="skill-icon">🐍</div><div class="skill-name">Python</div><div class="skill-level">Advanced</div><div class="skill-bar"><div class="skill-bar-fill" style="width:90%"></div></div></div>
+    <div class="skill-card"><div class="skill-icon">⚡</div><div class="skill-name">FastAPI</div><div class="skill-level">Advanced</div><div class="skill-bar"><div class="skill-bar-fill" style="width:88%"></div></div></div>
+    <div class="skill-card"><div class="skill-icon">🐘</div><div class="skill-name">PostgreSQL</div><div class="skill-level">Intermediate</div><div class="skill-bar"><div class="skill-bar-fill" style="width:75%"></div></div></div>
+    <div class="skill-card"><div class="skill-icon">🗺️</div><div class="skill-name">SQLAlchemy</div><div class="skill-level">Intermediate</div><div class="skill-bar"><div class="skill-bar-fill" style="width:72%"></div></div></div>
+    <div class="skill-card"><div class="skill-icon">✅</div><div class="skill-name">Pydantic</div><div class="skill-level">Advanced</div><div class="skill-bar"><div class="skill-bar-fill" style="width:85%"></div></div></div>
+    <div class="skill-card"><div class="skill-icon">🐳</div><div class="skill-name">Docker</div><div class="skill-level">Intermediate</div><div class="skill-bar"><div class="skill-bar-fill" style="width:70%"></div></div></div>
+    <div class="skill-card"><div class="skill-icon">🔀</div><div class="skill-name">Git</div><div class="skill-level">Advanced</div><div class="skill-bar"><div class="skill-bar-fill" style="width:88%"></div></div></div>
+    <div class="skill-card"><div class="skill-icon">📡</div><div class="skill-name">REST API</div><div class="skill-level">Advanced</div><div class="skill-bar"><div class="skill-bar-fill" style="width:90%"></div></div></div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="projects-section-header">
+    <div>
+      <div class="section-label">// 03. projects</div>
+      <div class="section-title" style="margin-bottom:.25rem">Проекты</div>
+      <div class="section-subtitle">Нажми «+» чтобы добавить свой проект со скриншотами</div>
+    </div>
+  </div>
+  <div class="projects-grid" id="projectsGrid">
+    <div class="add-project-card" onclick="openProjectModal()">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      <div class="add-project-label">Добавить проект</div>
+      <div style="font-size:.75rem;text-align:center;line-height:1.5">Название, описание,<br>скриншоты, теги, ссылки</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="section-label">// 04. education</div>
+  <div class="section-title">Образование</div>
+  <div class="section-subtitle">Университет и курсы — добавляй с дипломом и сертификатами</div>
+
+  <!-- University (static) -->
+  <div class="edu-card">
+    <div class="edu-card-header">
+      <div class="edu-icon">🎓</div>
+      <div class="edu-body">
+        <div class="edu-degree">Бакалавр — Информационные технологии</div>
+        <div class="edu-school">Название вашего университета</div>
+        <div class="edu-year">20XX — 20XX</div>
+        <div class="edu-desc-text">Изучал алгоритмы, базы данных, сети и разработку ПО. Дипломная работа — backend-система на Python.</div>
+      </div>
+    </div>
+    <div class="upload-zone" id="diplomaZone" onclick="handleDiplomaClick()">
+      <div class="upload-zone-icon" id="diplomaIcon">📄</div>
+      <div class="upload-zone-info">
+        <div class="upload-zone-title" id="diplomaTitle">Загрузить диплом (PDF)</div>
+        <div class="upload-zone-hint" id="diplomaHint">Нажми чтобы выбрать · PDF до 10 MB</div>
+      </div>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text3)"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    </div>
+    <input type="file" id="diplomaInput" accept=".pdf" onchange="loadDiploma(event)" style="display:none">
+  </div>
+
+  <!-- Courses -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem">
+    <div style="font-size:1rem;font-weight:700">Курсы и сертификаты</div>
+    <button class="btn btn-outline btn-sm" onclick="openCourseModal()">+ Добавить курс</button>
+  </div>
+  <div class="courses-grid" id="coursesGrid">
+    <div class="add-course-card" onclick="openCourseModal()">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      <div class="add-course-label">Добавить курс</div>
+      <div style="font-size:.72rem;text-align:center">Название, платформа,<br>сертификат (фото/PDF)</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label">// 05. contact</div>
+  <div class="section-title">Контакты</div>
+  <div class="contact-grid">
+    <div class="contact-text">
+      <p>Открыт к новым проектам, стажировкам и интересным задачам. Напиши — отвечу быстро.</p>
+      <a href="mailto:your@email.com" class="btn btn-primary">✉️ Написать мне</a>
+    </div>
+    <div class="contact-links">
+      <a href="mailto:your@email.com" class="contact-link">
+        <div class="contact-icon">✉️</div>
+        <div class="contact-info"><div class="contact-label">Email</div><div class="contact-val">your@email.com</div></div>
+        <span class="contact-arrow">→</span>
+      </a>
+      <a href="https://t.me/yourusername" target="_blank" class="contact-link">
+        <div class="contact-icon">✈️</div>
+        <div class="contact-info"><div class="contact-label">Telegram</div><div class="contact-val">@yourusername</div></div>
+        <span class="contact-arrow">→</span>
+      </a>
+      <a href="https://github.com/yourusername" target="_blank" class="contact-link">
+        <div class="contact-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        </div>
+        <div class="contact-info"><div class="contact-label">GitHub</div><div class="contact-val">github.com/yourusername</div></div>
+        <span class="contact-arrow">→</span>
+      </a>
+      <a href="https://linkedin.com/in/yourusername" target="_blank" class="contact-link">
+        <div class="contact-icon">💼</div>
+        <div class="contact-info"><div class="contact-label">LinkedIn</div><div class="contact-val">linkedin.com/in/yourusername</div></div>
+        <span class="contact-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>© 2024 Amalbek · Built with FastAPI mindset</footer>
+
+<!-- ===== PROJECT MODAL ===== -->
+<div class="modal-overlay hidden" id="projectModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeProjectModal()">✕</button>
+    <div class="modal-title" id="projectModalTitle">Новый проект</div>
+
+    <div class="field">
+      <label>Название проекта *</label>
+      <input type="text" id="pName" placeholder="Например: Auth Service API">
+    </div>
+    <div class="field">
+      <label>Описание</label>
+      <textarea id="pDesc" placeholder="Что делает проект, какие задачи решает..."></textarea>
+    </div>
+    <div class="field">
+      <label>Теги / стек (через запятую)</label>
+      <input type="text" id="pTags" placeholder="FastAPI, PostgreSQL, Docker, JWT">
+    </div>
+    <div class="field">
+      <label>GitHub ссылка</label>
+      <input type="url" id="pGithub" placeholder="https://github.com/...">
+    </div>
+    <div class="field">
+      <label>Live Demo ссылка</label>
+      <input type="url" id="pDemo" placeholder="https://...">
+    </div>
+    <div class="field">
+      <label>Скриншоты проекта</label>
+      <div class="screenshots-upload-area" onclick="document.getElementById('pScreenshotsInput').click()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text3)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span style="font-size:.82rem;color:var(--text3)">Нажми чтобы выбрать скриншоты<br><span style="font-size:.7rem">JPG, PNG — можно несколько</span></span>
+      </div>
+      <div class="screenshots-preview" id="pScreenshotsPreview"></div>
+      <input type="file" id="pScreenshotsInput" accept="image/*" multiple style="display:none" onchange="handleScreenshots(event)">
+    </div>
+
+    <div style="display:flex;gap:.75rem;justify-content:flex-end;margin-top:.5rem">
+      <button class="btn btn-outline btn-sm" onclick="closeProjectModal()">Отмена</button>
+      <button class="btn btn-primary btn-sm" onclick="saveProject()">Сохранить проект</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== COURSE MODAL ===== -->
+<div class="modal-overlay hidden" id="courseModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeCourseModal()">✕</button>
+    <div class="modal-title">Добавить курс</div>
+
+    <div class="field">
+      <label>Название курса *</label>
+      <input type="text" id="cName" placeholder="Например: FastAPI — полный курс">
+    </div>
+    <div class="field">
+      <label>Платформа</label>
+      <input type="text" id="cPlatform" placeholder="Stepik, Udemy, YouTube, Coursera...">
+    </div>
+    <div class="field">
+      <label>Год прохождения</label>
+      <input type="text" id="cYear" placeholder="2024">
+    </div>
+    <div class="field">
+      <label>Что изучил / описание</label>
+      <textarea id="cDesc" placeholder="Ключевые темы, что узнал..." style="min-height:60px"></textarea>
+    </div>
+    <div class="field">
+      <label>Сертификат (фото или PDF)</label>
+      <div class="screenshots-upload-area" onclick="document.getElementById('cCertInput').click()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text3)"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        <span style="font-size:.82rem;color:var(--text3)">Загрузить сертификат<br><span style="font-size:.7rem">JPG, PNG или PDF</span></span>
+      </div>
+      <div id="cCertPreview" style="margin-top:.5rem"></div>
+      <input type="file" id="cCertInput" accept="image/*,.pdf" style="display:none" onchange="handleCert(event)">
+    </div>
+
+    <div style="display:flex;gap:.75rem;justify-content:flex-end;margin-top:.5rem">
+      <button class="btn btn-outline btn-sm" onclick="closeCourseModal()">Отмена</button>
+      <button class="btn btn-primary btn-sm" onclick="saveCourse()">Сохранить курс</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox hidden" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<script>
+// ---- THEME / MENU ----
+function toggleTheme(){
+  const h=document.documentElement,dark=h.getAttribute('data-theme')==='dark';
+  h.setAttribute('data-theme',dark?'light':'dark');
+  document.getElementById('themeIcon').textContent=dark?'🌙':'☀️';
+}
+function toggleMenu(){document.getElementById('mobileMenu').classList.toggle('open')}
+
+// ---- PHOTO ----
+function loadPhoto(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const img=document.getElementById('profileImg');
+    img.src=ev.target.result;img.classList.add('loaded');
+    document.getElementById('photoPlaceholder').style.display='none';
+  };r.readAsDataURL(f);
+}
+
+// ---- DIPLOMA ----
+let diplomaFile=null;
+function loadDiploma(e){
+  const f=e.target.files[0];if(!f)return;
+  diplomaFile=f;
+  document.getElementById('diplomaZone').classList.add('has-file');
+  document.getElementById('diplomaIcon').textContent='✅';
+  document.getElementById('diplomaTitle').textContent=f.name;
+  document.getElementById('diplomaHint').textContent='Загружен · '+(f.size/1024).toFixed(0)+' KB · нажми для просмотра';
+}
+function handleDiplomaClick(){
+  if(diplomaFile){window.open(URL.createObjectURL(diplomaFile),'_blank')}
+  else{document.getElementById('diplomaInput').click()}
+}
+
+// ---- LIGHTBOX ----
+function openLightbox(src){
+  document.getElementById('lightboxImg').src=src;
+  document.getElementById('lightbox').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.add('hidden');
+  document.body.style.overflow='';
+}
+
+// ============ PROJECTS ============
+let projects=[];
+let editProjectId=null;
+let pendingScreenshots=[];// array of {url, name}
+
+function openProjectModal(id){
+  editProjectId=id||null;
+  pendingScreenshots=[];
+  document.getElementById('pScreenshotsPreview').innerHTML='';
+  if(id!=null){
+    const p=projects.find(x=>x.id===id);
+    document.getElementById('projectModalTitle').textContent='Редактировать проект';
+    document.getElementById('pName').value=p.name;
+    document.getElementById('pDesc').value=p.desc;
+    document.getElementById('pTags').value=p.tags.join(', ');
+    document.getElementById('pGithub').value=p.github||'';
+    document.getElementById('pDemo').value=p.demo||'';
+    pendingScreenshots=[...p.screenshots];
+    renderScreenshotThumbs();
+  } else {
+    document.getElementById('projectModalTitle').textContent='Новый проект';
+    document.getElementById('pName').value='';
+    document.getElementById('pDesc').value='';
+    document.getElementById('pTags').value='';
+    document.getElementById('pGithub').value='';
+    document.getElementById('pDemo').value='';
+  }
+  document.getElementById('projectModal').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+}
+function closeProjectModal(){
+  document.getElementById('projectModal').classList.add('hidden');
+  document.body.style.overflow='';
+}
+
+function handleScreenshots(e){
+  const files=[...e.target.files];
+  files.forEach(f=>{
+    const r=new FileReader();
+    r.onload=ev=>{ pendingScreenshots.push({url:ev.target.result,name:f.name}); renderScreenshotThumbs(); };
+    r.readAsDataURL(f);
+  });
+  e.target.value='';
+}
+function removeScreenshot(i){pendingScreenshots.splice(i,1);renderScreenshotThumbs();}
+function renderScreenshotThumbs(){
+  const c=document.getElementById('pScreenshotsPreview');
+  c.innerHTML=pendingScreenshots.map((s,i)=>`
+    <div class="screenshot-thumb">
+      <img src="${s.url}" alt="${s.name}">
+      <button class="screenshot-thumb-remove" onclick="removeScreenshot(${i})">✕</button>
+    </div>`).join('');
+}
+
+function saveProject(){
+  const name=document.getElementById('pName').value.trim();
+  if(!name){alert('Введи название проекта');return;}
+  const p={
+    id:editProjectId!=null?editProjectId:Date.now(),
+    name,
+    desc:document.getElementById('pDesc').value.trim(),
+    tags:document.getElementById('pTags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    github:document.getElementById('pGithub').value.trim(),
+    demo:document.getElementById('pDemo').value.trim(),
+    screenshots:[...pendingScreenshots]
+  };
+  if(editProjectId!=null){
+    const idx=projects.findIndex(x=>x.id===editProjectId);
+    projects[idx]=p;
+  } else {
+    projects.push(p);
+  }
+  closeProjectModal();
+  renderProjects();
+}
+
+function deleteProject(id){
+  if(!confirm('Удалить проект?'))return;
+  projects=projects.filter(x=>x.id!==id);
+  renderProjects();
+}
+
+function renderProjects(){
+  const grid=document.getElementById('projectsGrid');
+  let html='';
+  projects.forEach(p=>{
+    const screenshotsHTML=p.screenshots.length
+      ?`<div style="position:relative;height:200px;background:var(--bg3);overflow:hidden;cursor:pointer" onclick="openLightbox('${p.screenshots[0].url}')">
+          <img src="${p.screenshots[0].url}" style="width:100%;height:100%;object-fit:cover;transition:transform .4s" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''">
+          ${p.screenshots.length>1?`<div class="screenshot-count">1 / ${p.screenshots.length}</div>`:''}
+          ${p.screenshots.length>1?`<div class="screenshots-nav">
+            <button class="screenshots-btn" onclick="event.stopPropagation();prevShot(${p.id})">‹</button>
+            <button class="screenshots-btn" onclick="event.stopPropagation();nextShot(${p.id})">›</button>
+          </div>`:''}
+        </div>`
+      :`<div style="height:140px;background:var(--bg3);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);font-size:.78rem;flex-direction:column;gap:.4rem" onclick="openProjectModal(${p.id})">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span>Скриншоты не добавлены</span>
+        </div>`;
+
+    const tagsHTML=p.tags.map(t=>`<span class="tag">${t}</span>`).join('');
+    const linksHTML=`
+      ${p.github?`<a href="${p.github}" target="_blank" class="project-ext-link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        GitHub</a>`:''}
+      ${p.demo?`<a href="${p.demo}" target="_blank" class="project-ext-link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Live Demo</a>`:''}`;
+
+    html+=`<div class="project-card" id="pcard-${p.id}">
+      ${screenshotsHTML}
+      <div class="project-body">
+        <div class="project-top">
+          <div class="project-title">${p.name}</div>
+          <div class="project-actions">
+            <button class="icon-btn" onclick="openProjectModal(${p.id})" title="Редактировать">✏️</button>
+            <button class="icon-btn danger" onclick="deleteProject(${p.id})" title="Удалить">🗑️</button>
+          </div>
+        </div>
+        ${p.desc?`<div class="project-desc-text">${p.desc}</div>`:''}
+        ${tagsHTML?`<div class="project-tags">${tagsHTML}</div>`:''}
+        ${(p.github||p.demo)?`<div class="project-links-row">${linksHTML}</div>`:''}
+      </div>
+    </div>`;
+  });
+
+  // add-card always last
+  html+=`<div class="add-project-card" onclick="openProjectModal()">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    <div class="add-project-label">Добавить проект</div>
+    <div style="font-size:.75rem;text-align:center;line-height:1.5">Название, описание,<br>скриншоты, теги, ссылки</div>
+  </div>`;
+  grid.innerHTML=html;
+}
+
+// screenshot navigation per card
+const shotIndexes={};
+function nextShot(id){
+  const p=projects.find(x=>x.id===id);if(!p||p.screenshots.length<2)return;
+  shotIndexes[id]=((shotIndexes[id]||0)+1)%p.screenshots.length;
+  updateCardShot(p);
+}
+function prevShot(id){
+  const p=projects.find(x=>x.id===id);if(!p||p.screenshots.length<2)return;
+  shotIndexes[id]=((shotIndexes[id]||0)-1+p.screenshots.length)%p.screenshots.length;
+  updateCardShot(p);
+}
+function updateCardShot(p){
+  const card=document.getElementById('pcard-'+p.id);if(!card)return;
+  const img=card.querySelector('img');
+  const cnt=card.querySelector('.screenshot-count');
+  const idx=shotIndexes[p.id]||0;
+  if(img)img.src=p.screenshots[idx].url;
+  if(cnt)cnt.textContent=(idx+1)+' / '+p.screenshots.length;
+  card.querySelector('[onclick*="openLightbox"]')&&(card.querySelector('[onclick*="openLightbox"]').setAttribute('onclick',`openLightbox('${p.screenshots[idx].url}')`));
+}
+
+// ============ COURSES ============
+let courses=[];
+let certFile=null,certIsImage=false;
+
+function openCourseModal(){
+  certFile=null;certIsImage=false;
+  document.getElementById('cName').value='';
+  document.getElementById('cPlatform').value='';
+  document.getElementById('cYear').value='';
+  document.getElementById('cDesc').value='';
+  document.getElementById('cCertPreview').innerHTML='';
+  document.getElementById('courseModal').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+}
+function closeCourseModal(){
+  document.getElementById('courseModal').classList.add('hidden');
+  document.body.style.overflow='';
+}
+
+function handleCert(e){
+  const f=e.target.files[0];if(!f)return;
+  certFile=f;
+  const isPDF=f.type==='application/pdf';
+  certIsImage=!isPDF;
+  const prev=document.getElementById('cCertPreview');
+  if(isPDF){
+    prev.innerHTML=`<div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;color:var(--success)">✅ ${f.name} · ${(f.size/1024).toFixed(0)} KB</div>`;
+  } else {
+    const r=new FileReader();
+    r.onload=ev=>{
+      prev.innerHTML=`<img src="${ev.target.result}" style="max-height:90px;border-radius:8px;border:1px solid var(--border2);cursor:pointer" onclick="openLightbox('${ev.target.result}')">`;
+      certFile._dataUrl=ev.target.result;
+    };r.readAsDataURL(f);
+  }
+}
+
+function saveCourse(){
+  const name=document.getElementById('cName').value.trim();
+  if(!name){alert('Введи название курса');return;}
+  const c={
+    id:Date.now(),
+    name,
+    platform:document.getElementById('cPlatform').value.trim(),
+    year:document.getElementById('cYear').value.trim(),
+    desc:document.getElementById('cDesc').value.trim(),
+    certIsImage,
+    certUrl:certFile?certFile._dataUrl||null:null,
+    certName:certFile?certFile.name:null,
+    certFile:certFile||null
+  };
+  courses.push(c);
+  closeCourseModal();
+  renderCourses();
+}
+
+function deleteCourse(id){
+  if(!confirm('Удалить курс?'))return;
+  courses=courses.filter(x=>x.id!==id);
+  renderCourses();
+}
+
+function renderCourses(){
+  const grid=document.getElementById('coursesGrid');
+  let html='';
+  courses.forEach(c=>{
+    const certHTML=c.certUrl&&c.certIsImage
+      ?`<div class="course-cert-preview" onclick="openLightbox('${c.certUrl}')">
+          <img src="${c.certUrl}" alt="сертификат">
+        </div>`
+      :c.certName&&!c.certIsImage
+      ?`<div class="course-cert-preview" style="cursor:default">
+          <div class="course-cert-placeholder" style="color:var(--success)">✅<span style="font-size:.7rem">${c.certName}</span></div>
+        </div>`
+      :`<div class="course-cert-preview">
+          <div class="course-cert-placeholder">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Сертификат не добавлен</span>
+          </div>
+        </div>`;
+    html+=`<div class="course-card">
+      ${certHTML}
+      <div class="course-body">
+        <div class="course-top">
+          <div>
+            <div class="course-name">${c.name}</div>
+            ${c.platform?`<div class="course-platform">${c.platform}${c.year?' · '+c.year:''}</div>`:''}
+          </div>
+          <button class="icon-btn danger" onclick="deleteCourse(${c.id})" title="Удалить" style="flex-shrink:0">🗑️</button>
+        </div>
+        ${c.desc?`<div class="course-desc-text">${c.desc}</div>`:''}
+      </div>
+    </div>`;
+  });
+  html+=`<div class="add-course-card" onclick="openCourseModal()">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    <div class="add-course-label">Добавить курс</div>
+    <div style="font-size:.72rem;text-align:center">Название, платформа,<br>сертификат (фото/PDF)</div>
+  </div>`;
+  grid.innerHTML=html;
+}
+
+// ---- SKILLS ANIMATION ----
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){
+      en.target.querySelectorAll('.skill-bar-fill').forEach(b=>{const w=b.style.width;b.style.width='0';setTimeout(()=>b.style.width=w,150)});
+      observer.unobserve(en.target);
+    }
+  });
+},{threshold:0.3});
+const ss=document.getElementById('skills');if(ss)observer.observe(ss);
+
+// close modals on overlay click
+document.getElementById('projectModal').addEventListener('click',function(e){if(e.target===this)closeProjectModal()});
+document.getElementById('courseModal').addEventListener('click',function(e){if(e.target===this)closeCourseModal()});
+</script>
+</body>
+</html>
